@@ -1,26 +1,26 @@
 package co.com.crediya.r2dbc.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Getter
 @Setter
 @RequiredArgsConstructor
-@Table(name = "users")
+@Table("users")
 public class UserEntity {
     @Id
     private Long id;
-    @Column(name = "first_name")
+    @Column("first_name")
     private String firstName;
-    @Column(name = "last_name")
+    @Column("last_name")
     private String lastName;
     private String email;
     private String document;
     private String phone;
-    @Column(name = "base_salary")
+    @Column("base_salary")
     private Long baseSalary;
 }

@@ -19,13 +19,21 @@ public class UserReactiveRepositoryAdapter extends ReactiveAdapterOperations<
     private final TransactionalOperator txOperator;
 
     public UserReactiveRepositoryAdapter(UserReactiveRepository repository, ObjectMapper mapper, TransactionalOperator txOperator) {
-        super(repository, mapper, d -> mapper.map(d, User.builder().getClass()).build(), txOperator);
+        super(repository, mapper, d -> User.builder()
+                .id(d.getId())
+                .firstName(d.getFirstName())
+                .lastName(d.getLastName())
+                .email(d.getEmail())
+                .document(d.getDocument())
+                .phone(d.getPhone())
+                .baseSalary(d.getBaseSalary())
+                .build(), txOperator);
         this.txOperator = txOperator;
     }
 
     @Override
     public Mono<Boolean> existByEmail(String email) {
-        return repository.existByEmail(email)
+        return repository.existsByEmail(email)
                 .as(txOperator::transactional);
     }
 }
