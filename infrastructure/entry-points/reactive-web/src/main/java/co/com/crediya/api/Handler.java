@@ -16,7 +16,6 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
@@ -25,7 +24,7 @@ import java.time.Instant;
 import java.util.Map;
 
 @Slf4j
-@Validated
+//@Validated
 @Component
 @RequiredArgsConstructor
 public class Handler {
@@ -45,7 +44,7 @@ public class Handler {
         return ServerResponse.ok().bodyValue(status);
     }
 
-    public Mono<ServerResponse> registerUser(@Valid ServerRequest request) {
+    public Mono<ServerResponse> registerUser(ServerRequest request) {
         return request.bodyToMono(UserRequestDto.class)
                 .flatMap(dto -> {
                     BindingResult errors = new BeanPropertyBindingResult(dto, "userRequestDto");

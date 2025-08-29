@@ -2,12 +2,12 @@ package co.com.crediya.api.exception;
 
 import co.com.crediya.api.dto.ResponseDto;
 import co.com.crediya.usecase.getuser.exception.UserNotFoundException;
+import co.com.crediya.usecase.getusers.exception.UsersNotFoundException;
 import co.com.crediya.usecase.registeruser.exception.EmailAlreadyExistsException;
 import co.com.crediya.usecase.registeruser.exception.InvalidBaseSalaryException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
-import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
@@ -40,12 +40,12 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler{
 
         status = switch (error) {
             case UserNotFoundException ignored -> HttpStatus.NOT_FOUND;
+            case UsersNotFoundException ignored -> HttpStatus.NOT_FOUND;
             case EmailAlreadyExistsException ignored -> HttpStatus.CONFLICT;
             case InvalidBaseSalaryException ignored -> HttpStatus.BAD_REQUEST;
             case IllegalArgumentException ignored -> HttpStatus.BAD_REQUEST;
             default -> HttpStatus.INTERNAL_SERVER_ERROR;
         };
-
 
         ResponseDto<Void> response = ResponseDto.<Void>builder()
                 .success(false)
