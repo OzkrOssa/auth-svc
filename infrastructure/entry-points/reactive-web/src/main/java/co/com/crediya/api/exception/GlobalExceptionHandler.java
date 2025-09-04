@@ -3,6 +3,7 @@ package co.com.crediya.api.exception;
 import co.com.crediya.api.dto.ResponseDto;
 import co.com.crediya.usecase.getuser.exception.UserNotFoundException;
 import co.com.crediya.usecase.getusers.exception.UsersNotFoundException;
+import co.com.crediya.usecase.login.exception.InvalidCredentialsException;
 import co.com.crediya.usecase.registeruser.exception.EmailAlreadyExistsException;
 import co.com.crediya.usecase.registeruser.exception.InvalidBaseSalaryException;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +44,7 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler{
             case UsersNotFoundException ignored -> HttpStatus.NOT_FOUND;
             case EmailAlreadyExistsException ignored -> HttpStatus.CONFLICT;
             case InvalidBaseSalaryException ignored -> HttpStatus.BAD_REQUEST;
+            case InvalidCredentialsException ignored -> HttpStatus.UNAUTHORIZED;
             case IllegalArgumentException ignored -> HttpStatus.BAD_REQUEST;
             default -> HttpStatus.INTERNAL_SERVER_ERROR;
         };

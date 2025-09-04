@@ -16,6 +16,7 @@ public class RouterRest {
         return route(GET("/api/v1/health"), handler::health)
                 .andRoute(POST("/api/v1/users"), handler::registerUser)
                 .and(route(GET("/api/v1/users/{email}"), handler::getUser))
-                .and(route(GET("/api/v1/users"), handler::getUsers));
+                .and(route(GET("/api/v1/users"), handler::getUsers))
+                .andRoute(POST("/api/v1/auth/login"), handler::login);
     }
 }

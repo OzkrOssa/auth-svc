@@ -4,6 +4,7 @@ import co.com.crediya.api.Handler;
 import co.com.crediya.api.RouterRest;
 import co.com.crediya.usecase.getuser.IGetUserUseCase;
 import co.com.crediya.usecase.getusers.IGetUsersUseCase;
+import co.com.crediya.usecase.login.ILoginUseCase;
 import co.com.crediya.usecase.registeruser.IRegisterUserUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,8 @@ class ConfigTest {
     private IGetUserUseCase getUserUseCase;
     @MockitoBean
     private IGetUsersUseCase getUsersUseCase;
+    @MockitoBean
+    private ILoginUseCase loginUseCase;
 
     @MockitoBean
     private Validator validator;

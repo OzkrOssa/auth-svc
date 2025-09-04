@@ -4,6 +4,8 @@ import co.com.crediya.model.tokenprovider.TokenProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -20,7 +22,14 @@ import java.util.Date;
 public class JwtProvider implements TokenProvider {
 
     private long expiration;
+    private String secret;
+
     private SecretKey secretKey;
+
+    @PostConstruct
+    public void init() {
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
+    }
 
     @Override
     public String generateToken(String email, String role) {

@@ -1,0 +1,18 @@
+package co.com.crediya.api.dto;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder(toBuilder = true)
+public class LoginDto {
+    @NotBlank(message = "email is required")
+    @Email(message = "email must be valid")
+    private String email;
+    @NotBlank(message = "password is required")
+    private String password;
+}

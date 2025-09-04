@@ -9,6 +9,8 @@ import co.com.crediya.usecase.getuser.IGetUserUseCase;
 import co.com.crediya.usecase.getuser.exception.UserNotFoundException;
 import co.com.crediya.usecase.getusers.IGetUsersUseCase;
 import co.com.crediya.usecase.getusers.exception.UsersNotFoundException;
+import co.com.crediya.usecase.login.ILoginUseCase;
+import co.com.crediya.usecase.login.exception.InvalidCredentialsException;
 import co.com.crediya.usecase.registeruser.IRegisterUserUseCase;
 import org.springframework.context.annotation.Import;
 import org.springframework.validation.Validator;
@@ -32,6 +34,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doAnswer;
 
 
+import java.util.List;
 import java.util.Map;
 
 @ContextConfiguration(classes = {RouterRest.class, Handler.class})
@@ -49,6 +52,9 @@ class RouterRestTest {
     private IGetUserUseCase getUserUseCase;
     @MockitoBean
     private IGetUsersUseCase getUsersUseCase;
+
+    @MockitoBean
+    private ILoginUseCase loginUseCase;
 
     @MockitoBean
     private Validator validator;
@@ -175,7 +181,6 @@ class RouterRestTest {
 
     }
 
-    //
     @Test
     void test_RegisterUser_WithInvalidSalary_ShouldReturnBadRequest() {
 
@@ -288,6 +293,53 @@ class RouterRestTest {
                     Assertions.assertThat(response.isSuccess()).isFalse();
                     Assertions.assertThat(response.getMessage()).isEqualTo("Not Found");
                     Assertions.assertThat(response.getData()).isNull();
+                });
+    }
+
+    @Test
+    void test_Login_WithValidCredentials_ShouldReturnSuccess() {
+        String email = "test@examplecom";
+        String password = "password123";
+
+        when(loginUseCase.execute(email, password))
+                .thenReturn(Mono.just("mocked_jwt_token"));
+
+        webTestClient.post()
+                .uri("/api/v1/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("email", email, "password", password))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ResponseDto.class)
+                .value(response -> {
+                    Assertions.assertThat(response.isSuccess()).isTrue();
+                    Assertions.assertThat(response.getMessage()).isEqualTo("Login successfully");
+                    Assertions.assertThat(response.getData()).isEqualTo(Map.of("token", "mocked_jwt_token"));
+                });
+    }
+
+    @Test
+    void test_Login_WithInvalidCredentials_ShouldReturnUnauthorized() {
+        String email = "test@examplecom";
+        String password = "wrongpassword";
+
+        when(loginUseCase.execute(email, password))
+                .thenReturn(Mono.error(new InvalidCredentialsException("Invalid email or password")));
+
+        webTestClient.post()
+                .uri("/api/v1/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("email", email, "password", password))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isUnauthorized()
+                .expectBody(ResponseDto.class)
+                .value(response -> {
+                    Assertions.assertThat(response.isSuccess()).isFalse();
+                    Assertions.assertThat(response.getMessage()).isEqualTo("Unauthorized");
+                    Assertions.assertThat(response.getData()).isNull();
+                    Assertions.assertThat(response.getErrors()).isEqualTo(List.of("Invalid email or password"));
                 });
     }
 }

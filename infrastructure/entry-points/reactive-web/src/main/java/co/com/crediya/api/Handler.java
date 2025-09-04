@@ -1,11 +1,13 @@
 package co.com.crediya.api;
 
+import co.com.crediya.api.dto.LoginDto;
 import co.com.crediya.api.dto.ResponseDto;
 import co.com.crediya.api.dto.UserRequestDto;
 import co.com.crediya.api.mapper.UserMapper;
 import co.com.crediya.model.user.User;
 import co.com.crediya.usecase.getuser.IGetUserUseCase;
 import co.com.crediya.usecase.getusers.IGetUsersUseCase;
+import co.com.crediya.usecase.login.ILoginUseCase;
 import co.com.crediya.usecase.registeruser.IRegisterUserUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,7 @@ public class Handler {
     private final IRegisterUserUseCase registerUserUseCase;
     private final IGetUserUseCase getUserUseCase;
     private final IGetUsersUseCase getUsersUseCase;
+    private final ILoginUseCase loginUseCase;
 
     private final Validator validator;
 
@@ -102,5 +105,38 @@ public class Handler {
                                 .data(users)
                                 .build()
                 ));
+    }
+
+    public Mono<ServerResponse> login(ServerRequest request) {
+        return request.bodyToMono(LoginDto.class)
+                .flatMap(dto -> {
+                    BindingResult errors = new BeanPropertyBindingResult(dto, "loginDto");
+                    validator.validate(dto, errors);
+
+                    if (errors.hasErrors()) {
+                        var errorMessages = errors.getAllErrors().stream()
+                                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                                .toList();
+
+                        ResponseDto<Void> response = ResponseDto.<Void>builder()
+                                .success(false)
+                                .message("Validation error")
+                                .errors(errorMessages)
+                                .build();
+
+                        return ServerResponse.badRequest()
+                                .bodyValue(response);
+                    }
+
+                    return loginUseCase.execute(dto.getEmail(), dto.getPassword())
+                            .flatMap(generatedToken -> {
+                                ResponseDto<Map<String,String>> response = ResponseDto.<Map<String,String>>builder()
+                                        .success(true)
+                                        .message("Login successfully")
+                                        .data(Map.of("token", generatedToken))
+                                        .build();
+                                return ServerResponse.ok().bodyValue(response);
+                            });
+                });
     }
 }
