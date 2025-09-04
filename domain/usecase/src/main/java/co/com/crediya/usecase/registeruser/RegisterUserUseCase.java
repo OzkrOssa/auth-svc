@@ -1,5 +1,6 @@
 package co.com.crediya.usecase.registeruser;
 
+import co.com.crediya.model.passwordencoder.PasswordEncoder;
 import co.com.crediya.model.user.User;
 import co.com.crediya.model.user.gateways.IUserRepository;
 import co.com.crediya.usecase.registeruser.exception.EmailAlreadyExistsException;
@@ -10,11 +11,15 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class RegisterUserUseCase implements IRegisterUserUseCase {
     private final IUserRepository repo;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Mono<User> execute(User user) {
         Mono<Boolean> emailCheck = repo.existByEmail(user.getEmail());
         Mono<Boolean> salaryCheck = Mono.just(user.isBaseSalaryValid());
+
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
 
         return Mono.zip(emailCheck, salaryCheck)
                 .flatMap(tuple -> {

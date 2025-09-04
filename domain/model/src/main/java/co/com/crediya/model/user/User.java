@@ -19,6 +19,8 @@ public class User {
     private String document;
     private String phone;
     private Long baseSalary;
+    private Long roleId;
+    private String password;
     private static final long MAX_SALARY = 15_000_000;
 
     public Boolean isBaseSalaryValid() {

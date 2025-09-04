@@ -1,5 +1,7 @@
 package co.com.crediya.config;
 
+import co.com.crediya.model.passwordencoder.PasswordEncoder;
+import co.com.crediya.model.role.gateways.IRoleRepository;
 import co.com.crediya.model.user.gateways.IUserRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -35,6 +37,16 @@ public class UseCasesConfigTest {
         @Bean
         public IUserRepository userRepository() {
             return Mockito.mock(IUserRepository.class);
+        }
+
+        @Bean
+        public IRoleRepository roleRepository() {
+            return Mockito.mock(IRoleRepository.class);
+        }
+
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+            return Mockito.mock(PasswordEncoder.class);
         }
 
         @Bean

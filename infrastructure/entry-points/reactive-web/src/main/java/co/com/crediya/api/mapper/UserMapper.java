@@ -14,6 +14,8 @@ public class UserMapper {
                 .email(dto.getEmail())
                 .phone(dto.getPhone())
                 .baseSalary(dto.getBaseSalary())
+                .roleId(dto.getRoleId())
+                .password(dto.getPassword())
                 .build();
     }
 }

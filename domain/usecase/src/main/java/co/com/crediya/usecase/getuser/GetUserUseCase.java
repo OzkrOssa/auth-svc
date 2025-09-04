@@ -11,9 +11,9 @@ public class GetUserUseCase implements IGetUserUseCase {
     private final IUserRepository repo;
 
     @Override
-    public Mono<User> execute(Long id) {
-        return repo.findById(id)
-                .switchIfEmpty(Mono.error(new UserNotFoundException("user not found with id: " + id)))
+    public Mono<User> execute(String email) {
+        return repo.findByEmail(email)
+                .switchIfEmpty(Mono.error(new UserNotFoundException("user not found with email: " + email)))
                 .flatMap(Mono::just);
     }
 }

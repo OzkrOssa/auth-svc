@@ -206,7 +206,7 @@ class RouterRestTest {
 
     @Test
     void test_GetUser_WithValidId_ShouldReturnUser() {
-        long userId = 1L;
+        String userEmail = validUserRequest.getEmail();
 
         User user = User.builder()
                 .firstName(validUserRequest.getFirstName())
@@ -217,11 +217,11 @@ class RouterRestTest {
                 .build();
 
 
-        when(getUserUseCase.execute(any(Long.class)))
+        when(getUserUseCase.execute(any(String.class)))
                 .thenReturn(Mono.just(user));
 
         webTestClient.get()
-                .uri("/api/v1/users"+"/{id}", userId)
+                .uri("/api/v1/users"+"/{email}", userEmail)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(ResponseDto.class)
@@ -233,14 +233,14 @@ class RouterRestTest {
 
     @Test
     void test_GetUser_WithInvalidId_ShouldReturnNotFound() {
-        long userId = 999L;
+        String userEmail = validUserRequest.getEmail();
 
-        when(getUserUseCase.execute(userId))
-                .thenReturn(Mono.error(new UserNotFoundException("user not found with id: " + userId)));
+        when(getUserUseCase.execute(userEmail))
+                .thenReturn(Mono.error(new UserNotFoundException("user not found with id: " + userEmail)));
 
 
         webTestClient.get()
-                .uri("/api/v1/users"+"/{id}", userId)
+                .uri("/api/v1/users"+"/{id}", userEmail)
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ResponseDto.class)

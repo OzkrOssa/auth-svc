@@ -1,5 +1,6 @@
 package co.com.crediya.usecase.registeruser;
 
+import co.com.crediya.model.passwordencoder.PasswordEncoder;
 import co.com.crediya.model.user.User;
 import co.com.crediya.model.user.gateways.IUserRepository;
 import co.com.crediya.usecase.registeruser.exception.EmailAlreadyExistsException;
@@ -19,6 +20,9 @@ class RegisterUserUseCaseTest {
     @Mock
     private IUserRepository repo;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private RegisterUserUseCase useCase;
 
@@ -31,11 +35,15 @@ class RegisterUserUseCaseTest {
                 .lastName("Doe")
                 .email("test@example.com")
                 .baseSalary(1000L)
+                .password("password123")
+                .roleId(1L)
                 .build();
 
     }
     @Test
     void registerUser_success() {
+        Mockito.when(passwordEncoder.encode(Mockito.any(String.class)))
+                .thenReturn("encodedPassword123");
 
         Mockito.when(repo.existByEmail(Mockito.any(String.class)))
                 .thenReturn(Mono.just(false));

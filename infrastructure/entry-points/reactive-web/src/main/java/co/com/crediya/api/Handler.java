@@ -79,9 +79,9 @@ public class Handler {
     }
 
     public Mono<ServerResponse> getUser(ServerRequest request) {
-        String id = request.pathVariable("id");
+        String email = request.pathVariable("email");
 
-        return getUserUseCase.execute(Long.valueOf(id))
+        return getUserUseCase.execute(email)
                 .flatMap(user -> ServerResponse.ok().bodyValue(
                         ResponseDto.builder()
                                 .success(true)

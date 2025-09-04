@@ -15,7 +15,7 @@ public class RouterRest {
     public RouterFunction<ServerResponse> routerFunction(Handler handler) {
         return route(GET("/api/v1/health"), handler::health)
                 .andRoute(POST("/api/v1/users"), handler::registerUser)
-                .and(route(GET("/api/v1/users/{id}"), handler::getUser))
+                .and(route(GET("/api/v1/users/{email}"), handler::getUser))
                 .and(route(GET("/api/v1/users"), handler::getUsers));
     }
 }

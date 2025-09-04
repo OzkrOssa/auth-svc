@@ -30,16 +30,17 @@ class GetUserUseCaseTest {
                 .lastName("Doe")
                 .email("test@example.com")
                 .baseSalary(1000L)
+                .roleId(1L)
                 .build();
 
     }
 
     @Test
     void getUser_success() {
-        Mockito.when(repo.findById(Mockito.anyLong()))
+        Mockito.when(repo.findByEmail(Mockito.anyString()))
                 .thenReturn(Mono.just(user));
 
-        StepVerifier.create(useCase.execute(Mockito.anyLong()))
+        StepVerifier.create(useCase.execute(user.getEmail()))
                 .expectNextMatches(u ->
                         u.getId().equals(1L) &&
                                 u.getFirstName().equals("John") &&
@@ -51,10 +52,10 @@ class GetUserUseCaseTest {
 
     @Test
     void getUser_userNotFound() {
-        Mockito.when(repo.findById(Mockito.anyLong()))
+        Mockito.when(repo.findByEmail(Mockito.anyString()))
                 .thenReturn(Mono.empty());
 
-        StepVerifier.create(useCase.execute(1L))
+        StepVerifier.create(useCase.execute(user.getEmail()))
                 .expectNextCount(0)
                 .expectComplete();
     }

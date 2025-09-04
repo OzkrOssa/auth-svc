@@ -13,9 +13,9 @@ import reactor.core.publisher.Mono;
 public class UserReactiveRepositoryAdapter extends ReactiveAdapterOperations<
         User,
         UserEntity,
-    Long,
-    UserReactiveRepository
-> implements IUserRepository {
+        Long,
+        UserReactiveRepository
+        > implements IUserRepository {
     private final TransactionalOperator txOperator;
 
     public UserReactiveRepositoryAdapter(UserReactiveRepository repository, ObjectMapper mapper, TransactionalOperator txOperator) {
@@ -27,6 +27,7 @@ public class UserReactiveRepositoryAdapter extends ReactiveAdapterOperations<
                 .document(d.getDocument())
                 .phone(d.getPhone())
                 .baseSalary(d.getBaseSalary())
+                .roleId(d.getRoleId())
                 .build(), txOperator);
         this.txOperator = txOperator;
     }
@@ -34,6 +35,12 @@ public class UserReactiveRepositoryAdapter extends ReactiveAdapterOperations<
     @Override
     public Mono<Boolean> existByEmail(String email) {
         return repository.existsByEmail(email)
+                .as(txOperator::transactional);
+    }
+
+    @Override
+    public Mono<User> findByEmail(String email) {
+        return repository.findByEmail(email)
                 .as(txOperator::transactional);
     }
 }
