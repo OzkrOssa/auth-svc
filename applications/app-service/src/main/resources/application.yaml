@@ -15,6 +15,10 @@ adapters:
     password: ${DB_PASSWORD:pass}
   profiles:
     include: null
+token:
+  jwt:
+    secret: ${JWT_SECRET:miClaveSuperSegura123!@#abcDEF456$%^789ExtraLargaConMuchosChars987654321}
+    expiration: ${JWT_EXPIRATION:3600000}
 management:
   endpoints:
     web:
