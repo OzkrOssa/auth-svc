@@ -15,10 +15,14 @@ adapters:
     password: ${DB_PASSWORD:pass}
   profiles:
     include: null
-token:
-  jwt:
-    secret: ${JWT_SECRET:miClaveSuperSegura123!@#abcDEF456$%^789ExtraLargaConMuchosChars987654321}
-    expiration: ${JWT_EXPIRATION:3600000}
+security:
+  token:
+    jwt:
+      secret: ${JWT_SECRET:miClaveSuperSegura123!@#abcDEF456$%^789ExtraLargaConMuchosChars987654321}
+      expiration: ${JWT_EXPIRATION:3600000}
+  login:
+    max-attempts: 5
+    lock-duration: 60
 management:
   endpoints:
     web:

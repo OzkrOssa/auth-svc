@@ -1,5 +1,6 @@
 package co.com.crediya.config;
 
+import co.com.crediya.model.loginattempt.LoginAttemptRepository;
 import co.com.crediya.model.passwordencoder.PasswordEncoder;
 import co.com.crediya.model.role.gateways.IRoleRepository;
 import co.com.crediya.model.tokenprovider.TokenProvider;
@@ -55,6 +56,11 @@ public class UseCasesConfigTest {
         @Bean
         public TokenProvider tokenProvider() {
             return Mockito.mock(TokenProvider.class);
+        }
+
+        @Bean
+        public LoginAttemptRepository loginAttemptRepository() {
+            return Mockito.mock(LoginAttemptRepository.class);
         }
 
         @Bean

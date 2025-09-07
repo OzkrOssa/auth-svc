@@ -1,5 +1,6 @@
 package co.com.crediya.usecase.login;
 
+import co.com.crediya.model.loginattempt.LoginAttemptRepository;
 import co.com.crediya.model.passwordencoder.PasswordEncoder;
 import co.com.crediya.model.role.Role;
 import co.com.crediya.model.role.gateways.IRoleRepository;
@@ -7,6 +8,7 @@ import co.com.crediya.model.tokenprovider.TokenProvider;
 import co.com.crediya.model.user.User;
 import co.com.crediya.model.user.gateways.IUserRepository;
 import co.com.crediya.usecase.login.exception.InvalidCredentialsException;
+import co.com.crediya.usecase.login.exception.LoginAttemptException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +20,7 @@ import reactor.test.StepVerifier;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +33,8 @@ class LoginUseCaseTest {
     private PasswordEncoder passwordEncoder;
     @Mock
     private TokenProvider tokenProvider;
+    @Mock
+    private LoginAttemptRepository loginAttemptRepository;
 
     @InjectMocks
     private LoginUseCase loginUseCase;
@@ -54,8 +59,10 @@ class LoginUseCaseTest {
 
     @Test
     void test_LoginUseCase_Success() {
+        when(loginAttemptRepository.isBlocked(anyString())).thenReturn(false);
         when(userRepo.findByEmail(anyString())).thenReturn(Mono.just(user));
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+        doNothing().when(loginAttemptRepository).loginSucceeded(anyString());
         when(roleRepo.findById(any(Long.class))).thenReturn(Mono.just(role));
         when(tokenProvider.generateToken(anyString(), anyString())).thenReturn("token");
 
@@ -78,9 +85,17 @@ class LoginUseCaseTest {
         when(userRepo.findByEmail(anyString())).thenReturn(Mono.just(user));
         when(passwordEncoder.matches(anyString(), anyString()))
                 .thenReturn(false);
-
+        doNothing().when(loginAttemptRepository).loginFailed(anyString());
         StepVerifier.create(loginUseCase.execute(user.getEmail(), "password"))
                 .expectError(InvalidCredentialsException.class)
+                .verify();
+    }
+
+    @Test
+    void test_LoginUseCase_FailBlockedEmail() {
+        when(loginAttemptRepository.isBlocked(anyString())).thenReturn(true);
+        StepVerifier.create(loginUseCase.execute(user.getEmail(), "password"))
+                .expectError(LoginAttemptException.class)
                 .verify();
     }
 }

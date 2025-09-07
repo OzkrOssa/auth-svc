@@ -16,7 +16,7 @@ import java.time.Instant;
 import java.util.Date;
 
 @Component
-@ConfigurationProperties(prefix = "token.jwt")
+@ConfigurationProperties(prefix = "security.token.jwt")
 @Getter
 @Setter
 public class JwtProvider implements TokenProvider {

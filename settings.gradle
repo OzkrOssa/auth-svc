@@ -28,3 +28,5 @@ include ':password'
 project(':password').projectDir = file('./infrastructure/security/password')
 include(':token')
 project(':token').projectDir = file('./infrastructure/security/token')
+include(':login-attempt')
+project(':login-attempt').projectDir = file('./infrastructure/security/login-attempt')
