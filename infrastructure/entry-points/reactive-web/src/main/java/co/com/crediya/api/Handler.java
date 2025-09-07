@@ -9,15 +9,14 @@ import co.com.crediya.usecase.getuser.IGetUserUseCase;
 import co.com.crediya.usecase.getusers.IGetUsersUseCase;
 import co.com.crediya.usecase.login.ILoginUseCase;
 import co.com.crediya.usecase.registeruser.IRegisterUserUseCase;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Validator;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
@@ -26,7 +25,6 @@ import java.time.Instant;
 import java.util.Map;
 
 @Slf4j
-//@Validated
 @Component
 @RequiredArgsConstructor
 public class Handler {
@@ -47,6 +45,7 @@ public class Handler {
         return ServerResponse.ok().bodyValue(status);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'ADVISOR')")
     public Mono<ServerResponse> registerUser(ServerRequest request) {
         return request.bodyToMono(UserRequestDto.class)
                 .flatMap(dto -> {
@@ -81,6 +80,7 @@ public class Handler {
 
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'ADVISOR')")
     public Mono<ServerResponse> getUser(ServerRequest request) {
         String email = request.pathVariable("email");
 
@@ -94,7 +94,7 @@ public class Handler {
                 ));
     }
 
-
+    @PreAuthorize("hasAnyRole('ADMIN', 'ADVISOR')")
     public Mono<ServerResponse> getUsers(ServerRequest request) {
         return getUsersUseCase.execute()
                 .collectList()

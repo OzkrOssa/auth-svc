@@ -2,16 +2,13 @@ package co.com.crediya.api.config;
 
 import co.com.crediya.api.Handler;
 import co.com.crediya.api.RouterRest;
+import co.com.crediya.config.SecurityConfig;
+import co.com.crediya.model.tokenprovider.TokenProvider;
 import co.com.crediya.usecase.getuser.IGetUserUseCase;
 import co.com.crediya.usecase.getusers.IGetUsersUseCase;
 import co.com.crediya.usecase.login.ILoginUseCase;
 import co.com.crediya.usecase.registeruser.IRegisterUserUseCase;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.context.annotation.Import;
@@ -20,11 +17,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.validation.Validator;
 
-import static org.mockito.Mockito.when;
-
 @ContextConfiguration(classes = {RouterRest.class, Handler.class})
 @WebFluxTest
-@Import({CorsConfig.class, SecurityHeadersConfig.class})
+@Import({CorsConfig.class, SecurityHeadersConfig.class, SecurityConfig.class})
 class ConfigTest {
 
     @Autowired
@@ -38,6 +33,10 @@ class ConfigTest {
     private IGetUsersUseCase getUsersUseCase;
     @MockitoBean
     private ILoginUseCase loginUseCase;
+
+    @MockitoBean
+    private TokenProvider tokenProvider;
+
 
     @MockitoBean
     private Validator validator;

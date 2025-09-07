@@ -4,6 +4,8 @@ import co.com.crediya.api.config.WebPropertiesConfig;
 import co.com.crediya.api.dto.ResponseDto;
 import co.com.crediya.api.dto.UserRequestDto;
 import co.com.crediya.api.exception.GlobalExceptionHandler;
+import co.com.crediya.config.SecurityConfig;
+import co.com.crediya.model.tokenprovider.TokenProvider;
 import co.com.crediya.model.user.User;
 import co.com.crediya.usecase.getuser.IGetUserUseCase;
 import co.com.crediya.usecase.getuser.exception.UserNotFoundException;
@@ -13,6 +15,7 @@ import co.com.crediya.usecase.login.ILoginUseCase;
 import co.com.crediya.usecase.login.exception.InvalidCredentialsException;
 import co.com.crediya.usecase.registeruser.IRegisterUserUseCase;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.validation.Validator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,8 +31,7 @@ import org.springframework.validation.BindingResult;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doAnswer;
 
@@ -39,7 +41,7 @@ import java.util.Map;
 
 @ContextConfiguration(classes = {RouterRest.class, Handler.class})
 @WebFluxTest
-@Import({GlobalExceptionHandler.class, WebPropertiesConfig.class})
+@Import({GlobalExceptionHandler.class, WebPropertiesConfig.class, SecurityConfig.class})
 class RouterRestTest {
 
     @Autowired
@@ -55,6 +57,9 @@ class RouterRestTest {
 
     @MockitoBean
     private ILoginUseCase loginUseCase;
+
+    @MockitoBean
+    private TokenProvider tokenProvider;
 
     @MockitoBean
     private Validator validator;
@@ -79,6 +84,10 @@ class RouterRestTest {
         invalidUserRequest.setEmail("invalid_email");
         invalidUserRequest.setPhone("test");
         invalidUserRequest.setBaseSalary(-1L);
+
+        when(tokenProvider.validateToken(anyString())).thenReturn(true);
+        when(tokenProvider.getEmailFromToken(anyString())).thenReturn("test@crediya.com");
+        when(tokenProvider.getRoleFromToken(anyString())).thenReturn("ADMIN");
     }
 
 
@@ -120,6 +129,7 @@ class RouterRestTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(validUserRequest)
                 .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer faketoken123")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(ResponseDto.class)
@@ -142,6 +152,7 @@ class RouterRestTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(invalidUserRequest)
                 .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer faketoken123")
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(ResponseDto.class)
@@ -169,6 +180,7 @@ class RouterRestTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(invalidUserRequest)
                 .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer faketoken123")
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(ResponseDto.class)
@@ -197,6 +209,7 @@ class RouterRestTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(invalidUserRequest)
                 .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer faketoken123")
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(ResponseDto.class)
@@ -227,6 +240,7 @@ class RouterRestTest {
 
         webTestClient.get()
                 .uri("/api/v1/users"+"/{email}", userEmail)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer faketoken123")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(ResponseDto.class)
@@ -246,6 +260,7 @@ class RouterRestTest {
 
         webTestClient.get()
                 .uri("/api/v1/users"+"/{id}", userEmail)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer faketoken123")
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ResponseDto.class)
@@ -270,6 +285,7 @@ class RouterRestTest {
 
         webTestClient.get()
                 .uri("/api/v1/users")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer faketoken123")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(ResponseDto.class)
@@ -286,6 +302,7 @@ class RouterRestTest {
 
         webTestClient.get()
                 .uri("/api/v1/users")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer faketoken123")
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ResponseDto.class)
